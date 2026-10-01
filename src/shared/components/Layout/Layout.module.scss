@@ -1,0 +1,11 @@
+.wrapper {
+    display: flex;
+
+    .sidebar {
+        width: 20%;
+    }
+
+    .main {
+        flex: 1;
+    }
+}

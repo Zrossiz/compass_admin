@@ -1,3 +1,3 @@
-export default function ProfessionPage() {
+export default function ProfessionPage() {  
   return <h1>Профессии</h1>;
 }
