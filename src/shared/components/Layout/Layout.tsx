@@ -1,9 +1,9 @@
 import { Header } from '../Header';
 import { Sidebar } from '../Sidebar';
 import styles from './Layout.module.scss';
-import { Outlet } from 'react-router';
+import type { LayoutProps } from './Layout.props';
 
-export const Layout = () => {
+export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.sidebar}>
@@ -14,7 +14,7 @@ export const Layout = () => {
           <Header />
         </div>
         <div className={styles.content}>
-          <Outlet />
+          {children}
         </div>
       </div>
     </div>

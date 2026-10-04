@@ -1,3 +1,9 @@
+import { Layout } from "../shared/components/Layout";
+
 export default function RolePage() {
-  return <h1>Роли</h1>;
+  return (
+    <Layout>
+      <h1>Роли</h1>
+    </Layout>
+  )
 }

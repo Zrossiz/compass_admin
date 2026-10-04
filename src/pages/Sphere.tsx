@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import styles from '../shared/styles/Home.module.scss';
-import type { Sphere } from '../modules/spheres/types';
-import { SphereList } from '../modules/spheres/components/SphereList/SphereList';
-import { getAllSpheres } from '../modules/spheres/api';
-import { SphereForm } from '../modules/spheres/components/SphereForm';
+import type { Sphere } from '../modules/sphere/types';
+import { SphereList } from '../modules/sphere/components/SphereList/SphereList';
+import { getAllSpheres } from '../modules/sphere/api';
+import { SphereForm } from '../modules/sphere/components/SphereForm';
+import { Layout } from '../shared/components/Layout';
 
 function SpherePage() {
   const [spheres, setSpheres] = useState<Sphere[]>([]);
@@ -27,26 +28,28 @@ function SpherePage() {
   }, []);
 
   return (
-    <div className={styles.wrapper}>
-      <h1>Сферы</h1>
-      <button type="button" onClick={() => setCreate(true)}>
-        Создать
-      </button>
-      {create && (
-        <SphereForm action="create" setOpen={setCreate} onSaved={loadSpheres} sphere={null} />
-      )}
-      {error && (
-        <div role="alert">
-          {error}
-          <button type="button" onClick={loadSpheres}>
-            Повторить
-          </button>
+    <Layout>
+      <div className={styles.wrapper}>
+        <h1>Сферы</h1>
+        <button type="button" onClick={() => setCreate(true)}>
+          Создать
+        </button>
+        {create && (
+          <SphereForm action="create" setOpen={setCreate} onSaved={loadSpheres} sphere={null} />
+        )}
+        {error && (
+          <div role="alert">
+            {error}
+            <button type="button" onClick={loadSpheres}>
+              Повторить
+            </button>
+          </div>
+        )}
+        <div className={styles.listWrapper}>
+          <SphereList items={spheres} onSaved={loadSpheres} />
         </div>
-      )}
-      <div className={styles.listWrapper}>
-        <SphereList items={spheres} onSaved={loadSpheres} />
       </div>
-    </div>
+    </Layout>
   );
 }
 

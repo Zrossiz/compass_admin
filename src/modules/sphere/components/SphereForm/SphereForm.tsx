@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { SphereFormProps } from './SphereForm.props';
 import styles from './SphereForm.module.scss';
-import { Button, Input, Textarea } from '@mantine/core';
+import { Input, Textarea } from '@mantine/core';
 import { createSphere, updateSphere } from '../../api';
 
 export const SphereForm = ({ action, sphere }: SphereFormProps) => {
@@ -46,10 +46,9 @@ export const SphereForm = ({ action, sphere }: SphereFormProps) => {
 
       {err != '' && <div className={styles.errWrapper}>Ошибка: {err}</div>}
 
-      <Button
-        value={action == 'update' ? 'Сохранить' : 'Создать'}
-        onClick={action == 'update' ? update : create}
-      />
+      <button onClick={action == 'update' ? () => update() : () => create()}>
+        {action == 'update' ? 'Сохранить' : 'Создать'}
+      </button>
     </div>
   );
 };
