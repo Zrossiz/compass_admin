@@ -1,5 +1,6 @@
-import type { Sphere } from "../../types"
+import type { Sphere } from '../../types';
 
 export type SphereListItemProps = {
-    sphere: Sphere;
-}
+  sphere: Sphere;
+  onSaved: () => void;
+};
