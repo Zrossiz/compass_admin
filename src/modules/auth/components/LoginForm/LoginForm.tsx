@@ -10,6 +10,7 @@ export const LoginForm = () => {
   const submit = async () => {
     try {
       await login(username, password);
+      window.location.replace("/spheres")
     } catch (error: unknown) {
       setErr(String(error));
     }
