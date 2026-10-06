@@ -42,15 +42,15 @@ jobs:
             --exclude='deploy.tar.gz' \
             -czf deploy.tar.gz \
             src \
-            .next \
+            dist \
             package.json \
             package-lock.json \
             tsconfig.json \
-            next.config.ts \
+            vite.config.ts \
             Dockerfile \
             .dockerignore \
             public \
-            eslint.config.mjs
+            eslint.config.js
       
       - name: Upload deployment artifact
         if: github.event_name == 'push'
