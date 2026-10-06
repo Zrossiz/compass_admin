@@ -1,0 +1,106 @@
+name: Admin CI/CD
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: admin-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      
+      - name: Install dependencies
+        run: npm i
+      
+      - name: Build admin
+        run: npm run build
+      
+      - name: Create deployment archive
+        if: github.event_name == 'push'
+        run: |
+          tar \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.env' \
+            --exclude='node_modules' \
+            --exclude='deploy.tar.gz' \
+            -czf deploy.tar.gz \
+            src \
+            .next \
+            package.json \
+            package-lock.json \
+            tsconfig.json \
+            next.config.ts \
+            Dockerfile \
+            .dockerignore \
+            public \
+            eslint.config.mjs
+      
+      - name: Upload deployment artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-${{ github.sha }}
+          path: deploy.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+  
+  deploy:
+    name: Deploy
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps: 
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-${{ github.sha }}
+      
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+      
+      - name: Upload admin to server
+        env: 
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_ARCHIVE: /tmp/compass-admin-${{ github.sha }}.tar.gz
+        run: |
+          test -n "$DEPLOY_PATH"
+          scp -P "$SSH_PORT" deploy.tar.gz "$SSH_USER@$SSH_HOST:$DEPLOY_ARCHIVE"
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "sudo -n mkdir -p '$DEPLOY_PATH' && \
+             sudo -n tar -xzf '$DEPLOY_ARCHIVE' -C '$DEPLOY_PATH' && \
+             rm '$DEPLOY_ARCHIVE' && \
+             cd '$DEPLOY_PATH' && \
+             sudo -n docker compose --env-file /home/compass/admin/.env -f /home/compass/backend/prod/docker-compose.prod.yaml up --build --no-deps -d admin"
+
+
+  
