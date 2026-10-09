@@ -1,0 +1,41 @@
+.wrapper {
+  width: min(480px, calc(100% - 32px));
+  margin-block: 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+
+  h2 {
+    margin: 0;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  select {
+    min-height: 36px;
+    padding-inline: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #fff;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.error {
+  color: #c92a2a;
+}
