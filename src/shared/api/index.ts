@@ -18,7 +18,7 @@ apiClient.interceptors.response.use(
         await refresh();
       } catch (err: unknown) {
         console.log(err);
-        window.location.replace("/");
+        window.location.replace('/');
       }
 
       return apiClient(error.config);

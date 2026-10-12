@@ -1,4 +1,4 @@
-import type  { PaginationProps } from './Pagination.props';
+import type { PaginationProps } from './Pagination.props';
 
 export const Pagination = ({ curPage, totalPages, onPageChange, disabled }: PaginationProps) => {
   if (totalPages <= 1) return null;

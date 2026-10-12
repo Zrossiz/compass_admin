@@ -1,5 +1,5 @@
 import { Input, Textarea } from '@mantine/core';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { getAllSpheres } from '../../../sphere/api';
 import type { Sphere } from '../../../sphere/types';
 import { createProfession, updateProfession } from '../../api';
@@ -43,7 +43,7 @@ export const ProfessionForm = ({ action, profession, setOpen, onSaved }: Profess
     };
   }, []);
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
 
