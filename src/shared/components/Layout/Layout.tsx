@@ -9,7 +9,7 @@ export const Layout = ({ children }: LayoutProps) => {
   const getMeQuery = async () => {
     try {
       const res = await getMe();
-      console.log(res.data)
+      console.log(res.data);
     } catch (err: unknown) {
       console.log(err);
     }
