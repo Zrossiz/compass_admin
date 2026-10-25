@@ -1,94 +1,58 @@
-# React + TypeScript + Vite
+# Компас — панель управления
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite + Mantine. Интерфейс на русском, адаптирован для узких экранов.
 
-Currently, two official plugins are available:
+## Запуск
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```sh
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Backend должен работать отдельно. По умолчанию используются `http://localhost:10000` для API и `http://localhost:9000` для изображений. Можно переопределить их в `.env.local`:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```dotenv
+VITE_BACKEND_URL=http://localhost:10000
+VITE_MEDIA_URL=http://localhost:9000
 ```
 
-## Маршруты админки
+Открывайте admin и backend с одинаковым именем хоста (`localhost` или `127.0.0.1`), чтобы cookie-авторизация работала. Разрешите origin админки в CORS backend. Для входа нужен существующий пользователь.
 
-Используется React Router в режиме SPA (Vite + `createBrowserRouter`).
-Маршруты описаны в `src/router.tsx`, общая оболочка — в `Layout` через `Outlet`.
+## Разделы
 
-- `/` → `/spheres` (с заменой записи в истории).
-- `/spheres` — сферы.
-- `/professions` — профессии.
-- `/specialities` — специальности.
-- `/roles` — роли.
-- `/users` — пользователи.
-- Неизвестный адрес — страница 404 внутри общей оболочки.
+- **Сферы, профессии, специальности, вузы:** создание, редактирование, удаление, поиск. У профессий и специальностей есть серверная пагинация и фильтр по родительской записи.
+- **Материалы профессии:** интервью с названием, ссылкой на видео и порядком.
+- **Материалы специальности:** интервью, траектории с изображениями, привязка и отвязка вузов. Открываются по ссылке «Открыть материалы» в строке каталога.
+- **Мой профиль:** изменение имени и пароля, удаление своего аккаунта.
+- **Выход:** очистка обеих HTTP-only cookie через backend.
 
-При размещении `dist` на сервере настройте отдачу `index.html` для адресов,
-которые не соответствуют существующим файлам (например, nginx:
-`try_files $uri $uri/ /index.html;`). Это необходимо для открытия прямых
-ссылок и обновления вложенных страниц. Vite dev и preview поддерживают это автоматически.
+Изображения траекторий: JPEG, PNG, WebP, не более 5 МБ. Текущий backend требует файл как при создании, так и при редактировании.
+
+В backend нет списка пользователей и ролей: эти разделы не имитируются. Регистрация через существующий публичный API меняет текущую сессию, поэтому она не используется как форма создания другого администратора.
+
+## Изменения API
+
+Вместе с админкой необходимо обновить backend:
+
+- `GET /api/v1/university` — список вузов, требует авторизации.
+- Ответы вузов содержат `description`; список по специальности также содержит `linkId`, идентификатор связи для безопасной отвязки.
+- `POST /api/v1/users/logout` — очищает cookie входа. JWT остаются действительными до истечения срока, серверного отзыва токенов в текущей архитектуре нет.
+
+Миграции не требуются. Существующие адреса API сохранены.
+
+## Проверки
+
+```sh
+npm run build
+npm run lint
+node --test tests/api.test.mjs
+```
+
+Проверки backend (из его каталога):
+
+```sh
+npm run build
+node --test tests/admin.test.cjs
+```
+
+Тесты проверяют повтор запросов и конкурентное обновление сессии, обработку ошибок, очистку cookie, данные вузов и регистрацию новых маршрутов. Они не заменяют интеграционный прогон с PostgreSQL и MinIO.

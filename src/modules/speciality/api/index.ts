@@ -20,8 +20,7 @@ export const updateSpeciality = async (
   title: string,
   description: string,
 ) => {
-  await apiClient.post('/api/v1/specialties', {
-    specialityId,
+  await apiClient.post(`/api/v1/specialties/${specialityId}`, {
     professionId,
     title,
     description,
