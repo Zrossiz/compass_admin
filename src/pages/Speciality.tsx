@@ -43,7 +43,7 @@ export default function SpecialityPage() {
 
   return (
     <Layout>
-      <h1>Профессии</h1>
+      <h1>Специальности</h1>
       <button type="button" onClick={() => setCreateOpen(true)}>
         Создать
       </button>

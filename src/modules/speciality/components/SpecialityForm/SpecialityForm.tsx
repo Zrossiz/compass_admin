@@ -22,7 +22,7 @@ export const SpecialityForm = ({ action, onSaved, setOpen, speciality }: Special
 
     const loadProfessions = async () => {
       try {
-        const result = await findProfessions(professionsFindPattern, 0, 5);
+        const result = await findProfessions(professionsFindPattern, 1, 5);
         if (active) {
           setProfessions(result.items);
         }
@@ -43,7 +43,7 @@ export const SpecialityForm = ({ action, onSaved, setOpen, speciality }: Special
     return () => {
       active = false;
     };
-  }, []);
+  }, [professionsFindPattern]);
 
   const submit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
